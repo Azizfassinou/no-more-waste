@@ -28,5 +28,8 @@ func main() {
 
 	r.GET("/merchants", handlers.GetMerchants)
 	r.POST("/merchants", handlers.CreateMerchant)
+	r.PUT("/merchants/:id", handlers.UpdateMerchant)
+	r.DELETE("/merchants/:id", handlers.DeleteMerchant)
+
 	r.Run(":8080")
 }
