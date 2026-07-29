@@ -8,7 +8,8 @@ import (
 
 type Merchant struct {
 	gorm.Model
-	Name        string    `json:"name"`
+	FirstName   string    `json:"firstname"`
+	LastName    string    `json:"last_name"`
 	Email       string    `json:"email" gorm:"unique"`
 	Phone       string    `json:"phone"`
 	Address     string    `json:"address"`

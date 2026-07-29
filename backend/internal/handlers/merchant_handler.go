@@ -20,7 +20,7 @@ func GetMerchants(c *gin.Context) {
 }
 
 func CreateMerchant(c *gin.Context) {
-	var input models.Merchant
+	var input []models.Merchant
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -51,7 +51,8 @@ func UpdateMerchant(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	merchant.Name = input.Name
+	merchant.FirstName = input.FirstName
+	merchant.LastName = input.LastName
 	merchant.Email = input.Email
 	merchant.Phone = input.Phone
 	merchant.Address = input.Address
@@ -78,7 +79,10 @@ func DeleteMerchant(c *gin.Context) {
 		return
 	}
 
-	database.DB.Delete(&merchant)
+	if err := database.DB.Delete(&merchant).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Commerçant supprimé avec succès",
 	})

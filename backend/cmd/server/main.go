@@ -5,11 +5,15 @@ import (
 
 	"github.com/FASSINOU/no-more-waste-api/internal/database"
 	"github.com/FASSINOU/no-more-waste-api/internal/handlers"
+	"github.com/FASSINOU/no-more-waste-api/internal/services"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	database.InitDB()
+
+	services.StartRenewalChecker()
+
 	r := gin.Default()
 	/* http.HandleFunc(("/ping"), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -30,6 +34,10 @@ func main() {
 	r.POST("/merchants", handlers.CreateMerchant)
 	r.PUT("/merchants/:id", handlers.UpdateMerchant)
 	r.DELETE("/merchants/:id", handlers.DeleteMerchant)
+
+	r.GET("/admin/users", handlers.GetUsers)
+	r.PUT("/admin/users/:id", handlers.UpdateUserRole)
+	r.DELETE("/admin/users/:id", handlers.DeleteUser)
 
 	r.Run(":8080")
 }
