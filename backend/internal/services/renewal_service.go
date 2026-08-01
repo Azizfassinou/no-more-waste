@@ -20,7 +20,7 @@ func StartRenewalChecker() {
 func checkRenewals() {
 	var merchants []models.Merchant
 
-	result := database.DB.Where("is_active = ?", true).Find(&merchants)
+	result := database.DB.Preload("User").Where("is_active = ? AND is_approved = ?", true, true).Find(&merchants)
 	if result.Error != nil {
 		log.Printf("Erreur lors de la vérification des renouvellements : %v", result.Error)
 		return
@@ -30,12 +30,12 @@ func checkRenewals() {
 
 	for _, merchant := range merchants {
 		if merchant.RenewalDate.Before(sevenDaysBefore) && merchant.RenewalDate.After(now) {
-			log.Printf("Envoi d'un rappel à %s %s : Votre abonnement expire bientôt %s", merchant.FirstName, merchant.LastName, merchant.RenewalDate.Format("02/01/2006"))
+			log.Printf("Envoi d'un rappel à %s %s : Votre abonnement expire bientôt %s", merchant.User.FirstName, merchant.User.LastName, merchant.RenewalDate.Format("02/01/2006"))
 
 			// Service d'e-mail à implémenter pour notifier l'expiration dans quelques jours
 		}
 		if merchant.RenewalDate.Before(now) {
-			log.Printf("Le commerçant %s %s a un abonnement expiré", merchant.FirstName, merchant.LastName)
+			log.Printf("Le commerçant %s %s a un abonnement expiré", merchant.User.FirstName, merchant.User.LastName)
 			merchant.IsActive = false
 			database.DB.Save(&merchant)
 			// Service d'e-mail à implémenter pour notifier l'expiration et la désactivation du compte

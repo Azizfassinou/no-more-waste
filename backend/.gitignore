@@ -1,0 +1,12 @@
+/bin/
+*.exe
+*.o
+
+*.db
+*.sqlite
+*.sqlite3
+
+.env
+
+.vscode/
+.idea/

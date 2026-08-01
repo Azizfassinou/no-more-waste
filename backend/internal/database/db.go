@@ -16,7 +16,7 @@ func InitDB() {
 	if err != nil {
 		log.Fatalf("Echec de la connexion à la base de données : %v", err)
 	}
-	err = DB.AutoMigrate(&models.Merchant{})
+	err = DB.AutoMigrate(&models.User{}, &models.Merchant{}, &models.Volunteer{}, &models.Staff{}, &models.Order{}, &models.CollectionMission{})
 	if err != nil {
 		log.Fatalf("Echec de la migration de la base de données : %v", err)
 	}

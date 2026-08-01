@@ -6,7 +6,60 @@ import (
 	"github.com/FASSINOU/no-more-waste-api/internal/database"
 	"github.com/FASSINOU/no-more-waste-api/internal/models"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
+
+func CreateStaffProfile(c *gin.Context) {
+	var input struct {
+		FirstName  string  `json:"firstname" binding:"required"`
+		LastName   string  `json:"lastname" binding:"required"`
+		Email      string  `json:"email" binding:"required, email"`
+		Password   string  `json:"password" binding:"required,min=8"`
+		Department string  `json:"department"`
+		JobTitle   string  `json:"job_title"`
+		Salary     float64 `json:"salary"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+
+	user := models.User{
+		FirstName: input.FirstName,
+		LastName:  input.LastName,
+		Email:     input.Email,
+		Password:  string(hashedPassword),
+		Role:      "staff",
+		IsActive:  true,
+	}
+
+	tx := database.DB.Begin()
+	if err := tx.Create(&user).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la création du profil du personnel"})
+		return
+	}
+
+	staff := models.Staff{
+		Department: input.Department,
+		JobTitle:   input.JobTitle,
+		Salary:     input.Salary,
+		UserID:     user.ID,
+	}
+
+	if err := tx.Create(&staff).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la création du profil du personnel"})
+		return
+	}
+	tx.Commit()
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Profil du personnel créé avec succès",
+		"data":    staff,
+	})
+}
 
 func GetUsers(c *gin.Context) {
 	var users []models.User

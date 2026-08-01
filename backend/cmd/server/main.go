@@ -5,6 +5,7 @@ import (
 
 	"github.com/FASSINOU/no-more-waste-api/internal/database"
 	"github.com/FASSINOU/no-more-waste-api/internal/handlers"
+	"github.com/FASSINOU/no-more-waste-api/internal/middlewares"
 	"github.com/FASSINOU/no-more-waste-api/internal/services"
 	"github.com/gin-gonic/gin"
 )
@@ -15,29 +16,44 @@ func main() {
 	services.StartRenewalChecker()
 
 	r := gin.Default()
-	/* http.HandleFunc(("/ping"), func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "API no More Waste en ligne"}`))
-	})
-	fmt.Println("Serveur démarré sur :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Printf("Erreur au démarrage du serveur : %v\n", err) */
-
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "API no More Waste en ligne avec SQLite Opérationnelle !",
 		})
 	})
 
-	r.GET("/merchants", handlers.GetMerchants)
-	r.POST("/merchants", handlers.CreateMerchant)
-	r.PUT("/merchants/:id", handlers.UpdateMerchant)
-	r.DELETE("/merchants/:id", handlers.DeleteMerchant)
+	r.POST("/login", handlers.Login)
+	r.POST("/register/client", handlers.RegisterClient)
+	r.POST("/register/merchant", handlers.RegisterMerchant)
+	r.GET("/Profile/:id", handlers.GetMyProfile)
 
-	r.GET("/admin/users", handlers.GetUsers)
-	r.PUT("/admin/users/:id", handlers.UpdateUserRole)
-	r.DELETE("/admin/users/:id", handlers.DeleteUser)
+	merchantGroup := r.Group("/merchant")
+	merchantGroup.Use(middlewares.AuthMiddleware(), middlewares.MerchantOnly())
+	{
+		merchantGroup.POST("/product", handlers.CreateProduct)
+		merchantGroup.PUT("/:id", handlers.UpdateMyMerchantProfile)
+	}
 
+	staffGroup := r.Group("/staff")
+	staffGroup.Use(middlewares.AuthMiddleware(), middlewares.StaffOnly())
+	{
+		staffGroup.GET("/merchants/pending", handlers.GetPendingMerchants)
+		staffGroup.PUT("/merchants/:id/approve", handlers.ApproveMerchant)
+		staffGroup.POST("/volunteers", handlers.RegisterVolunteer)
+		staffGroup.POST("/missions", handlers.CreateCollectionMission)
+	}
+
+	adminGroup := r.Group("/admin")
+	adminGroup.Use(middlewares.AuthMiddleware(), middlewares.AdminOnly())
+	{
+		adminGroup.GET("/users", handlers.GetUsers)
+		adminGroup.PUT("/users/:id", handlers.UpdateUserRole)
+		adminGroup.DELETE("/users/:id", handlers.DeleteUser)
+		adminGroup.POST("/staff", handlers.CreateStaffProfile)
+		adminGroup.GET("/merchants/pending", handlers.GetPendingMerchants)
+		adminGroup.PUT("/merchants/:id/approve", handlers.ApproveMerchant)
+		adminGroup.POST("/volunteers", handlers.RegisterVolunteer)
+		adminGroup.POST("/missions", handlers.CreateCollectionMission)
+	}
 	r.Run(":8080")
 }
