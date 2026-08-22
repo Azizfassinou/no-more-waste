@@ -22,14 +22,7 @@ func main() {
 	}
 
 	if err == nil {
-		secretKey := services.GetStripeSecretKey()
-		if len(secretKey) > 12 {
-			log.Printf("Fichier .env chargé avec succès ! (Clé Stripe: %s...)", secretKey[:12])
-		} else {
-			log.Println("Fichier .env chargé avec succès !")
-		}
-	} else {
-		log.Println("Fichier .env non trouvé.")
+		log.Println("Fichier .env chargé avec succès !")
 	}
 
 	database.InitDB()
