@@ -1,7 +1,10 @@
 package services
 
 import (
+	"fmt"
 	"log"
+	"net/smtp"
+	"os"
 	"time"
 
 	"github.com/FASSINOU/no-more-waste-api/internal/database"
@@ -17,6 +20,24 @@ func StartRenewalChecker() {
 	}()
 }
 
+func sendEmail(to string, subject string, body string) error {
+	smtpHost := os.Getenv("SMTP_HOST")
+	smtpPort := os.Getenv("SMTP_PORT")
+	smtpUser := os.Getenv("SMTP_USERNAME")
+	smtpPass := os.Getenv("SMTP_PASSWORD")
+
+	if smtpHost == "" || smtpPort == "" {
+		log.Printf("[SIMULATION EMAIL] À: %s | Sujet: %s | Corps: %s", to, subject, body)
+		return nil
+	}
+
+	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
+	msg := []byte(fmt.Sprintf("To: %s\r\nSubject: %s\r\n\r\n%s", to, subject, body))
+
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUser, []string{to}, msg)
+	return err
+}
+
 func checkRenewals() {
 	var merchants []models.Merchant
 
@@ -30,15 +51,30 @@ func checkRenewals() {
 
 	for _, merchant := range merchants {
 		if merchant.RenewalDate.Before(sevenDaysBefore) && merchant.RenewalDate.After(now) {
-			log.Printf("Envoi d'un rappel à %s %s : Votre abonnement expire bientôt %s", merchant.User.FirstName, merchant.User.LastName, merchant.RenewalDate.Format("02/01/2006"))
+			subject := "No More Waste - Votre adhésion expire bientôt"
+			body := fmt.Sprintf("Bonjour %s,\n\nVotre adhésion annuelle à No More Waste expire le %s.\nPensez à la renouveler pour continuer à profiter de nos services.\n\nL'équipe No More Waste", merchant.User.FirstName, merchant.RenewalDate.Format("02/01/2006"))
 
-			// Service d'e-mail à implémenter pour notifier l'expiration dans quelques jours
+			err := sendEmail(merchant.User.Email, subject, body)
+			if err != nil {
+				log.Printf("Erreur d'envoi d'email de rappel à %s: %v", merchant.User.Email, err)
+			} else {
+				log.Printf("Rappel envoyé à %s", merchant.User.Email)
+			}
 		}
 		if merchant.RenewalDate.Before(now) {
 			log.Printf("Le commerçant %s %s a un abonnement expiré", merchant.User.FirstName, merchant.User.LastName)
 			merchant.IsActive = false
 			database.DB.Save(&merchant)
-			// Service d'e-mail à implémenter pour notifier l'expiration et la désactivation du compte
+
+			subject := "No More Waste - Adhésion expirée"
+			body := fmt.Sprintf("Bonjour %s,\n\nVotre adhésion à No More Waste est arrivée à expiration.\nVotre compte a été temporairement désactivé.\n\nContactez-nous pour la renouveler.\n\nL'équipe No More Waste", merchant.User.FirstName)
+
+			err := sendEmail(merchant.User.Email, subject, body)
+			if err != nil {
+				log.Printf("Erreur d'envoi d'email de désactivation à %s: %v", merchant.User.Email, err)
+			} else {
+				log.Printf("Email de désactivation envoyé à %s", merchant.User.Email)
+			}
 		}
 	}
 }

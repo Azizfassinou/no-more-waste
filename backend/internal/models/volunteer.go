@@ -10,6 +10,7 @@ type Volunteer struct {
 	Availability string `json:"availability"`
 	Vehicle      bool   `json:"vehicle"`
 
-	UserID uint `json:"user_id"`
-	User   User `json:"user,omitempty"`
+	UserID uint    `json:"user_id"`
+	User   User    `json:"user,omitempty"`
+	Skills []Skill `json:"skills,omitempty" gorm:"many2many:volunteer_skills;"`
 }

@@ -13,7 +13,7 @@ func CreateStaffProfile(c *gin.Context) {
 	var input struct {
 		FirstName  string  `json:"firstname" binding:"required"`
 		LastName   string  `json:"lastname" binding:"required"`
-		Email      string  `json:"email" binding:"required, email"`
+		Email      string  `json:"email" binding:"required,email"`
 		Password   string  `json:"password" binding:"required,min=8"`
 		Department string  `json:"department"`
 		JobTitle   string  `json:"job_title"`
@@ -81,7 +81,7 @@ func UpdateUserRole(c *gin.Context) {
 	}
 	var input struct {
 		Role     string `json:"role"`
-		IsActive bool   `json:"is_active"`
+		IsActive *bool  `json:"is_active"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -90,8 +90,8 @@ func UpdateUserRole(c *gin.Context) {
 	if input.Role != "" {
 		user.Role = input.Role
 	}
-	if input.IsActive {
-		user.IsActive = input.IsActive
+	if input.IsActive != nil {
+		user.IsActive = *input.IsActive
 	}
 	if err := database.DB.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la mise à jour du rôle de l'utilisateur"})

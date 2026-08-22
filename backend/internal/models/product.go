@@ -10,6 +10,7 @@ type Product struct {
 	gorm.Model
 	Title         string    `json:"title"`
 	Description   string    `json:"description"`
+	Barcode       string    `json:"barcode" gorm:"unique"`
 	OriginalPrice float64   `json:"original_price"`
 	DiscountPrice float64   `json:"discount_price"`
 	Quantity      int       `json:"quantity"`

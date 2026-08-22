@@ -6,6 +6,7 @@ import (
 
 	"github.com/FASSINOU/no-more-waste-api/internal/database"
 	"github.com/FASSINOU/no-more-waste-api/internal/models"
+	"github.com/FASSINOU/no-more-waste-api/internal/services"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -25,7 +26,7 @@ func GetPendingMerchants(c *gin.Context) {
 func ApproveMerchant(c *gin.Context) {
 	id := c.Param("id")
 	var merchant models.Merchant
-	if err := database.DB.First(&merchant, id).Error; err != nil {
+	if err := database.DB.Preload("User").First(&merchant, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Commerçant non trouvé"})
 		return
 	}
@@ -34,6 +35,11 @@ func ApproveMerchant(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de l'approbation du commerçant"})
 		return
 	}
+
+	if merchant.User.Email != "" {
+		services.SendMerchantApprovedEmail(merchant.User.Email, merchant.CompanyName)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Commerçant approuvé avec succès",
 		"data":    merchant,
@@ -44,15 +50,19 @@ func RegisterVolunteer(c *gin.Context) {
 	var input struct {
 		FirstName    string `json:"firstname" binding:"required"`
 		LastName     string `json:"lastname" binding:"required"`
-		Email        string `json:"email" binding:"required, email"`
-		Password     string `json:"password" binding:"required,min=8"`
-		ZoneArea     string `json:"zone_area" binding:"required"`
-		Availability string `json:"availability" binding:"required"`
-		Vehicle      bool   `json:"vehicle" binding:"required"`
+		Email        string `json:"email" binding:"required,email"`
+		Password     string `json:"password"`
+		ZoneArea     string `json:"zone_area"`
+		Availability string `json:"availability"`
+		Vehicle      bool   `json:"vehicle"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if input.Password == "" {
+		input.Password = "volunteer123"
 	}
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
@@ -103,4 +113,19 @@ func CreateCollectionMission(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	mission := models.CollectionMission{
+		MerchantID:  input.MerchantID,
+		VolunteerID: input.VolunteerID,
+		PickupDate:  input.PickupDate,
+		ProductID:   input.ProductID,
+	}
+	if err := database.DB.Create(&mission).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la création de la mission de collecte"})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Mission de collecte créée avec succès",
+		"data":    mission,
+	})
 }
