@@ -46,7 +46,6 @@ func main() {
 		})
 	})
 	r.POST("/seed", handlers.SeedDatabase)
-	r.GET("/seed", handlers.SeedDatabase)
 
 	r.POST("/login", handlers.Login)
 	r.POST("/forgot-password", handlers.ForgotPassword)

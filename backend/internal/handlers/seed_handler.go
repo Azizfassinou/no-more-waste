@@ -20,7 +20,6 @@ func SeedDatabase(c *gin.Context) {
 	}
 	hashedStr := string(hashedPassword)
 
-	// Admin
 	adminUser := models.User{
 		FirstName: "Admin",
 		LastName:  "Système",
@@ -33,7 +32,6 @@ func SeedDatabase(c *gin.Context) {
 	}
 	_ = db.Where(models.User{Email: adminUser.Email}).FirstOrCreate(&adminUser)
 
-	// Staff
 	staffUser := models.User{
 		FirstName: "Marc",
 		LastName:  "Dubois",
@@ -54,7 +52,6 @@ func SeedDatabase(c *gin.Context) {
 		_ = db.Where(models.Staff{UserID: staffUser.ID}).FirstOrCreate(&staffProfile)
 	}
 
-	// Skills
 	skillsList := []models.Skill{
 		{Name: "Permis B / Transport", Category: "Transport"},
 		{Name: "Distribution Alimentaire", Category: "Logistique"},
@@ -71,7 +68,6 @@ func SeedDatabase(c *gin.Context) {
 		}
 	}
 
-	// Volunteers
 	volunteersData := []struct {
 		FirstName    string
 		LastName     string
@@ -137,7 +133,6 @@ func SeedDatabase(c *gin.Context) {
 		}
 	}
 
-	// Clients
 	clientsData := []struct {
 		FirstName string
 		LastName  string
