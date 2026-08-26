@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/FASSINOU/no-more-waste-api/internal/models"
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
