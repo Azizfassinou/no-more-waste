@@ -24,7 +24,7 @@ func SendEmail(to string, subject string, htmlBody string) error {
 
 	if host == "" || username == "" || password == "" {
 		err := errors.New("configuration SMTP absente ou incomplète (SMTP_HOST, SMTP_USERNAME ou SMTP_PASSWORD non renseignés dans backend/.env)")
-		log.Printf(" [SMTP ERROR] Impossible d'envoyer l'e-mail à %s [Sujet: %s] : %v", to, subject, err)
+		log.Printf("[SMTP ERROR] Impossible d'envoyer l'e-mail à %s [Sujet: %s] : %v", to, subject, err)
 		return err
 	}
 
@@ -56,16 +56,16 @@ func SendEmail(to string, subject string, htmlBody string) error {
 		}
 		conn, err := tls.Dial("tcp", addr, tlsconfig)
 		if err != nil {
-			log.Printf(" [SMTP ERROR] Échec de la connexion TLS avec le serveur %s:%d : %v", host, port, err)
+			log.Printf("[SMTP ERROR] Échec de la connexion TLS avec le serveur %s:%d : %v", host, port, err)
 			return fmt.Errorf("erreur connexion TLS SMTP (%s:%d): %w", host, port, err)
 		}
 		client, err := smtp.NewClient(conn, host)
 		if err != nil {
-			log.Printf(" [SMTP ERROR] Échec de l'initialisation du client SMTP pour %s : %v", host, err)
+			log.Printf("[SMTP ERROR] Échec de l'initialisation du client SMTP pour %s : %v", host, err)
 			return fmt.Errorf("erreur client SMTP: %w", err)
 		}
 		if err = client.Auth(auth); err != nil {
-			log.Printf(" [SMTP ERROR] Échec de l'authentification SMTP (vérifiez SMTP_USERNAME et SMTP_PASSWORD) : %v", err)
+			log.Printf("[SMTP ERROR] Échec de l'authentification SMTP (vérifiez SMTP_USERNAME et SMTP_PASSWORD) : %v", err)
 			return fmt.Errorf("échec authentification SMTP: %w", err)
 		}
 		if err = client.Mail(from); err != nil {
@@ -73,17 +73,17 @@ func SendEmail(to string, subject string, htmlBody string) error {
 			return fmt.Errorf("expéditeur SMTP rejeté: %w", err)
 		}
 		if err = client.Rcpt(to); err != nil {
-			log.Printf(" [SMTP ERROR] Rejet du destinataire '%s' par le serveur SMTP : %v", to, err)
+			log.Printf("[SMTP ERROR] Rejet du destinataire '%s' par le serveur SMTP : %v", to, err)
 			return fmt.Errorf("destinataire SMTP rejeté: %w", err)
 		}
 		w, err := client.Data()
 		if err != nil {
-			log.Printf(" [SMTP ERROR] Erreur lors du transfert des données de l'e-mail : %v", err)
+			log.Printf("[SMTP ERROR] Erreur lors du transfert des données de l'e-mail : %v", err)
 			return fmt.Errorf("erreur données SMTP: %w", err)
 		}
 		_, err = w.Write([]byte(message))
 		if err != nil {
-			log.Printf(" [SMTP ERROR] Erreur lors de l'écriture du contenu de l'e-mail : %v", err)
+			log.Printf("[SMTP ERROR] Erreur lors de l'écriture du contenu de l'e-mail : %v", err)
 			return fmt.Errorf("erreur écriture message SMTP: %w", err)
 		}
 		w.Close()
@@ -91,12 +91,12 @@ func SendEmail(to string, subject string, htmlBody string) error {
 	} else {
 		err := smtp.SendMail(addr, auth, username, []string{to}, []byte(message))
 		if err != nil {
-			log.Printf(" [SMTP ERROR] Échec d'envoi de l'e-mail à %s via le serveur %s:%d : %v. Veuillez vérifier votre hôte, port et mot de passe d'application dans backend/.env", to, host, port, err)
+			log.Printf("[SMTP ERROR] Échec d'envoi de l'e-mail à %s via le serveur %s:%d : %v. Veuillez vérifier votre hôte, port et mot de passe d'application dans backend/.env", to, host, port, err)
 			return fmt.Errorf("échec d'envoi SMTP (%s:%d): %w", host, port, err)
 		}
 	}
 
-	log.Printf(" [SMTP SUCCESS] E-mail transmis avec succès à %s [Sujet: %s]", to, subject)
+	log.Printf("[SMTP SUCCESS] E-mail transmis avec succès à %s [Sujet: %s]", to, subject)
 	return nil
 }
 
@@ -111,7 +111,7 @@ func SendResetPasswordCode(toEmail string, code string) {
 	body := fmt.Sprintf(`
 		<div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f8fafc; color: #1e293b;">
 			<div style="max-width: 500px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
-				<h2 style="color: #2d6a4f; margin-top: 0;">No More Waste </h2>
+				<h2 style="color: #2d6a4f; margin-top: 0;">No More Waste 🌿</h2>
 				<p>Bonjour,</p>
 				<p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
 				<p>Voici votre code de sécurité à 6 chiffres :</p>
@@ -130,7 +130,7 @@ func SendOrderConfirmationEmail(toEmail string, orderID uint, totalAmount float6
 	body := fmt.Sprintf(`
 		<div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f8fafc; color: #1e293b;">
 			<div style="max-width: 550px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
-				<h2 style="color: #2d6a4f; margin-top: 0;">Commande Validée ! </h2>
+				<h2 style="color: #2d6a4f; margin-top: 0;">Commande Validée ! 🛒</h2>
 				<p>Merci pour votre engagement anti-gaspillage !</p>
 				<p>Votre commande <strong>N° %d</strong> a bien été enregistrée et réglée avec succès.</p>
 				<table style="width: 100%%; margin: 20px 0; border-collapse: collapse;">
@@ -148,7 +148,7 @@ func SendOrderConfirmationEmail(toEmail string, orderID uint, totalAmount float6
 }
 
 func SendMerchantApprovedEmail(toEmail string, companyName string) {
-	subject := "Bienvenue ! Votre compte commerçant No More Waste est validé "
+	subject := "Bienvenue ! Votre compte commerçant No More Waste est validé"
 	body := fmt.Sprintf(`
 		<div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f8fafc; color: #1e293b;">
 			<div style="max-width: 550px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">

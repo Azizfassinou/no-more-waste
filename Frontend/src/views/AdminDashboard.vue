@@ -240,9 +240,9 @@
         <div class="form-row">
           <div class="form-group"><label>Date</label><input v-model="newRound.date" type="date" /></div>
           <div class="form-group">
-            <label>Bénévole Chauffeur (Transport / Livraison)</label>
+            <label>Bénévole Chauffeur</label>
             <select v-model.number="newRound.volunteer_id">
-              <option :value="null">-- Sélectionner un chauffeur --</option>
+              <option :value="null">Sélectionner un chauffeur</option>
               <option v-for="v in volunteers" :key="v.ID" :value="v.ID">
                 {{ v.user?.firstname }} {{ v.user?.last_name }} {{ v.vehicle ? '(Véhicule OK)' : '(Sans véhicule)' }} — {{ v.skills?.map(s => s.name).join(', ') || 'Chauffeur' }}
               </option>

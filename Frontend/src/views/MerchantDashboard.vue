@@ -10,25 +10,18 @@
 
     <div v-if="msg" :class="'alert ' + (msgType === 'ok' ? 'alert-success' : 'alert-error')">{{ msg }}</div>
 
-    
     <div v-if="renewalDate && (isSubscriptionExpired || isSubscriptionExpiringSoon)" class="subscription-banner" :class="isSubscriptionExpired ? 'banner-expired' : 'banner-warning'">
-      <div class="banner-content">
-        <span class="banner-icon">{{ isSubscriptionExpired ? '' : '⏳' }}</span>
-        <div>
-          <strong v-if="isSubscriptionExpired">Votre abonnement annuel a expiré le {{ formattedRenewalDate }}.</strong>
-          <strong v-else>Votre abonnement expire dans {{ daysUntilRenewal }} jour(s) (le {{ formattedRenewalDate }}).</strong>
-          <p style="margin: 0.2rem 0 0 0; font-size: 0.88rem; opacity: 0.9;">
-            Renouvelez dès maintenant pour continuer à publier et vendre vos invendus sans interruption.
-          </p>
-        </div>
-      </div>
-      <button class="btn-renew-banner" @click="renewSubscription">
-         Renouveler (15,00 €)
-      </button>
+        <strong v-if="isSubscriptionExpired">Votre abonnement annuel a expiré le {{ formattedRenewalDate }}.</strong>
+        <strong v-else>Votre abonnement expire dans {{ daysUntilRenewal }} jour(s) (le {{ formattedRenewalDate }}).</strong>
+        <p style="margin: 0.2rem 0 0 0; font-size: 0.88rem; opacity: 0.9;">
+          Renouvelez dès maintenant pour continuer à publier et vendre vos invendus sans interruption.
+        </p>
+        <button class="btn-renew-banner" @click="renewSubscription">
+        Renouveler (15,00 €)
+        </button>
     </div>
 
     <div v-if="tab === 'my-products'">
-      
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
         <div style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);">
           <div style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Ma Cagnotte (Chiffre d'Affaires)</div>
@@ -44,7 +37,7 @@
             <span v-else class="badge-status badge-status-success">Actif</span>
           </div>
           <button style="margin-top: 0.6rem; background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: background 0.2s;" @click="renewSubscription">
-             Renouveler (15 €)
+            🔄 Renouveler (15 €)
           </button>
         </div>
 
@@ -149,7 +142,7 @@
         <button class="btn btn-primary" @click="updateMerchantProfile">{{ $t('client.updateProfile') }}</button>
       </div>
 
-      <h2 class="section-title" style="margin-top: 2rem;"> Statut de l'Abonnement Commerçant</h2>
+      <h2 class="section-title" style="margin-top: 2rem;">Statut de l'Abonnement Commerçant</h2>
       <div class="form-section subscription-card">
         <div class="subscription-details">
           <div class="subscription-item">
@@ -171,7 +164,7 @@
           Le renouvellement prolonge votre accès d'un an supplémentaire à compter de la date d'échéance. Le paiement est sécurisé par Stripe.
         </p>
         <button class="btn btn-primary btn-renew-stripe" @click="renewSubscription">
-           Renouveler mon abonnement annuel (15,00 €)
+          Renouveler mon abonnement annuel (15,00 €)
         </button>
       </div>
     </div>
