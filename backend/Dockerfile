@@ -16,8 +16,9 @@ RUN go mod download
 # Copie du code source
 COPY . .
 
-# Compilation d'un binaire statique ultraléger
+# Compilation des binaires statiques ultralégers
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o server ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o seed seeder.go
 
 # Étape 2 : Image d'exécution minimale
 FROM alpine:latest
@@ -25,8 +26,9 @@ FROM alpine:latest
 WORKDIR /app
 RUN apk add --no-cache ca-certificates tzdata && mkdir -p /app/data
 
-# Copie du binaire et de l'environnement
+# Copie des binaires et de l'environnement
 COPY --from=builder /app/server .
+COPY --from=builder /app/seed .
 COPY --from=builder /app/.env ./.env
 
 EXPOSE 8080
