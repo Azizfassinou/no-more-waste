@@ -3,6 +3,7 @@ package database
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/FASSINOU/no-more-waste-api/internal/models"
 	"gorm.io/driver/sqlite"
@@ -21,6 +22,12 @@ func InitDB() {
 			} else if _, err3 := os.Stat("../../no-more-waste.db"); err3 == nil {
 				dbFile = "../../no-more-waste.db"
 			}
+		}
+	} else {
+		// S'assurer que le dossier parent existe (ex: /app/data)
+		dir := filepath.Dir(dbFile)
+		if dir != "." && dir != "" {
+			_ = os.MkdirAll(dir, 0755)
 		}
 	}
 
