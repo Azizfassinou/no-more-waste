@@ -441,11 +441,13 @@ export default {
     },
     downloadPDF(id) {
       const token = localStorage.getItem('token')
-      window.open('http://localhost:8080' + this.prefix + '/distribution-rounds/' + id + '/pdf?token=' + token, '_blank')
+      const base = window.location.hostname === 'localhost' ? 'http://localhost:8080' : window.location.origin
+      window.open(base + this.prefix + '/distribution-rounds/' + id + '/pdf?token=' + token, '_blank')
     },
     exportServicesCSV() {
       const token = localStorage.getItem('token')
-      window.open('http://localhost:8080' + this.prefix + '/services/export?token=' + token, '_blank')
+      const base = window.location.hostname === 'localhost' ? 'http://localhost:8080' : window.location.origin
+      window.open(base + this.prefix + '/services/export?token=' + token, '_blank')
     }
   }
 }
