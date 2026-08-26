@@ -10,7 +10,7 @@
       <button :class="{ active: tab === 'missions' }" @click="tab = 'missions'">{{ $t('dashboards.tabs.missions') }}</button>
       <button :class="{ active: tab === 'services' }" @click="tab = 'services'">{{ $t('dashboards.tabs.services') }}</button>
       <button :class="{ active: tab === 'rounds' }" @click="tab = 'rounds'">{{ $t('dashboards.tabs.rounds') }}</button>
-      <button :class="{ active: tab === 'deliveries' }" @click="tab = 'deliveries'">Paniers Clients Payés</button>
+      <button :class="{ active: tab === 'deliveries' }" @click="tab = 'deliveries'">{{ $t('dashboards.tabs.deliveries') }}</button>
     </div>
 
     <div v-if="msg" :class="'alert ' + (msgType === 'ok' ? 'alert-success' : 'alert-error')">{{ msg }}</div>
@@ -314,23 +314,23 @@
     </div>
 
     <div v-if="tab === 'deliveries'">
-      <h2 class="section-title">Paniers / Commandes Clients Validés (Paiement Stripe OK)</h2>
+      <h2 class="section-title">{{ $t('dashboards.deliveriesTitle') }}</h2>
       <p style="color: #64748b; margin-bottom: 1rem;">
-        Consultez les paniers payés par les clients et assignez-les aux tournées des bénévoles selon leurs zones et disponibilités.
+        {{ $t('dashboards.deliveriesSubtitle') }}
       </p>
 
-      <div v-if="deliveries.length === 0" class="empty-state">Aucun panier client en attente de livraison</div>
+      <div v-if="deliveries.length === 0" class="empty-state">{{ $t('dashboards.noDeliveries') }}</div>
       <div class="table-container" v-else>
         <table>
           <thead>
             <tr>
-              <th>Client / Destinataire</th>
-              <th>Adresse de Livraison</th>
-              <th>Produit Commandé</th>
-              <th>Quantité</th>
-              <th>Statut Livraison</th>
-              <th>Tournée Assignée</th>
-              <th>Action Logistique</th>
+              <th>{{ $t('dashboards.deliveriesTable.recipient') }}</th>
+              <th>{{ $t('dashboards.deliveriesTable.address') }}</th>
+              <th>{{ $t('dashboards.deliveriesTable.product') }}</th>
+              <th>{{ $t('dashboards.deliveriesTable.quantity') }}</th>
+              <th>{{ $t('dashboards.deliveriesTable.status') }}</th>
+              <th>{{ $t('dashboards.deliveriesTable.round') }}</th>
+              <th>{{ $t('dashboards.deliveriesTable.action') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -346,21 +346,21 @@
               </td>
               <td>
                 <span v-if="d.distribution_round_id">
-                  Tournée #{{ d.distribution_round_id }} (Bénévole: {{ d.distribution_round?.volunteer?.user?.firstname }} {{ d.distribution_round?.volunteer?.user?.last_name }})
+                  {{ $t('dashboards.roundPrefix') }}#{{ d.distribution_round_id }} ({{ $t('dashboards.volunteerPrefix') }}: {{ d.distribution_round?.volunteer?.user?.firstname }} {{ d.distribution_round?.volunteer?.user?.last_name }})
                 </span>
                 <span v-else style="color: #ef4444; font-weight: 600;">
-                  Non assignée
+                  {{ $t('dashboards.unassigned') }}
                 </span>
               </td>
               <td>
                 <div style="display: flex; gap: 4px;">
                   <select v-model="selectedRoundForDelivery[d.ID]" style="font-size:0.8rem; padding: 4px;">
-                    <option :value="null">-- Choisir une tournée --</option>
+                    <option :value="null">{{ $t('dashboards.selectRound') }}</option>
                     <option v-for="r in rounds" :key="r.ID" :value="r.ID">
-                      Tournée #{{ r.ID }} ({{ r.volunteer?.user?.firstname }} {{ r.volunteer?.user?.last_name }} — {{ r.volunteer?.zone_area || 'Toutes zones' }})
+                      {{ $t('dashboards.roundPrefix') }}#{{ r.ID }} ({{ r.volunteer?.user?.firstname }} {{ r.volunteer?.user?.last_name }} — {{ r.volunteer?.zone_area || $t('dashboards.allZones') }})
                     </option>
                   </select>
-                  <button class="btn btn-primary btn-sm" @click="assignDeliveryToRound(d.ID)">Assigner</button>
+                  <button class="btn btn-primary btn-sm" @click="assignDeliveryToRound(d.ID)">{{ $t('common.assign') }}</button>
                 </div>
               </td>
             </tr>
