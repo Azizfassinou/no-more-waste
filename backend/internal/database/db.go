@@ -24,7 +24,6 @@ func InitDB() {
 			}
 		}
 	} else {
-		// S'assurer que le dossier parent existe (ex: /app/data)
 		dir := filepath.Dir(dbFile)
 		if dir != "." && dir != "" {
 			_ = os.MkdirAll(dir, 0755)
