@@ -14,7 +14,7 @@ func main() {
 	_ = godotenv.Load("../.env")
 	_ = godotenv.Load("../../.env")
 
-	log.Println("=== Démarrage du Seeder de Production — No More Waste ===")
+	log.Println("Démarrage du Seeder")
 	database.InitDB()
 	db := database.DB
 
@@ -25,7 +25,6 @@ func main() {
 	}
 	hashedStr := string(hashedPassword)
 
-	// 1. Compte Admin
 	adminUser := models.User{
 		FirstName: "Admin",
 		LastName:  "Système",
@@ -39,10 +38,9 @@ func main() {
 	if err := db.Where(models.User{Email: adminUser.Email}).FirstOrCreate(&adminUser).Error; err != nil {
 		log.Printf("Erreur création Admin : %v", err)
 	} else {
-		log.Printf("[OK] Compte Admin : %s (Mot de passe : %s)", adminUser.Email, defaultPassword)
+		log.Printf("Compte Admin : %s (Mot de passe : %s)", adminUser.Email, defaultPassword)
 	}
 
-	// 2. Compte Staff
 	staffUser := models.User{
 		FirstName: "Marc",
 		LastName:  "Dubois",
@@ -66,7 +64,6 @@ func main() {
 		db.Where(models.Staff{UserID: staffUser.ID}).FirstOrCreate(&staffProfile)
 	}
 
-	// 3. Compétences Bénévoles
 	skillsList := []models.Skill{
 		{Name: "Permis B / Transport", Category: "Transport"},
 		{Name: "Distribution Alimentaire", Category: "Logistique"},
@@ -80,11 +77,10 @@ func main() {
 		var s models.Skill
 		if err := db.Where("name = ?", sk.Name).FirstOrCreate(&s, sk).Error; err == nil {
 			seededSkills = append(seededSkills, s)
-			log.Printf("[OK] Compétence : %s (%s)", s.Name, s.Category)
+			log.Printf("Compétence : %s (%s)", s.Name, s.Category)
 		}
 	}
 
-	// 4. Bénévoles
 	volunteersData := []struct {
 		FirstName    string
 		LastName     string
@@ -132,7 +128,7 @@ func main() {
 			IsActive:  true,
 		}
 		if err := db.Where(models.User{Email: u.Email}).FirstOrCreate(&u).Error; err == nil {
-			log.Printf("[OK] Compte Bénévole User : %s (Mot de passe : %s)", u.Email, defaultPassword)
+			log.Printf("Compte Bénévole User : %s (Mot de passe : %s)", u.Email, defaultPassword)
 			vProfile := models.Volunteer{
 				UserID:       u.ID,
 				ZoneArea:     vData.ZoneArea,
@@ -151,7 +147,6 @@ func main() {
 		}
 	}
 
-	// 5. Clients
 	clientsData := []struct {
 		FirstName string
 		LastName  string
@@ -194,9 +189,9 @@ func main() {
 			IsActive:  true,
 		}
 		if err := db.Where(models.User{Email: cu.Email}).FirstOrCreate(&cu).Error; err == nil {
-			log.Printf("[OK] Compte Client : %s (Mot de passe : %s)", cu.Email, defaultPassword)
+			log.Printf("Compte Client : %s (Mot de passe : %s)", cu.Email, defaultPassword)
 		}
 	}
 
-	log.Println(" Seeding Terminé avec Succès ")
+	log.Println("Seeding Terminé avec Succès")
 }
