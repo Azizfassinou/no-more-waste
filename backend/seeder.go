@@ -25,6 +25,7 @@ func main() {
 	}
 	hashedStr := string(hashedPassword)
 
+	// 1. Compte Admin
 	adminUser := models.User{
 		FirstName: "Admin",
 		LastName:  "Système",
@@ -41,6 +42,7 @@ func main() {
 		log.Printf("[OK] Compte Admin : %s (Mot de passe : %s)", adminUser.Email, defaultPassword)
 	}
 
+	// 2. Compte Staff
 	staffUser := models.User{
 		FirstName: "Marc",
 		LastName:  "Dubois",
@@ -64,6 +66,7 @@ func main() {
 		db.Where(models.Staff{UserID: staffUser.ID}).FirstOrCreate(&staffProfile)
 	}
 
+	// 3. Compétences Bénévoles
 	skillsList := []models.Skill{
 		{Name: "Permis B / Transport", Category: "Transport"},
 		{Name: "Distribution Alimentaire", Category: "Logistique"},
@@ -81,6 +84,7 @@ func main() {
 		}
 	}
 
+	// 4. Bénévoles
 	volunteersData := []struct {
 		FirstName    string
 		LastName     string
@@ -147,6 +151,7 @@ func main() {
 		}
 	}
 
+	// 5. Clients
 	clientsData := []struct {
 		FirstName string
 		LastName  string
