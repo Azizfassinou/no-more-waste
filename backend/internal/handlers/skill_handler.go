@@ -90,7 +90,10 @@ func AssignSkillsToVolunteer(c *gin.Context) {
 		return
 	}
 
-	database.DB.Preload("Skills").Preload("User").First(&volunteer, volunteerID)
+	if err := database.DB.Preload("Skills").Preload("User").First(&volunteer, volunteerID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Bénévole non trouvé"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Compétences assignées avec succès",

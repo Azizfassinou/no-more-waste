@@ -177,7 +177,7 @@ func SeedDatabase(c *gin.Context) {
 		_ = db.Where(models.User{Email: cu.Email}).FirstOrCreate(&cu)
 	}
 
-	log.Println("[SEED] Base de données peuplée avec succès")
+	log.Println("Base de données peuplée avec succès")
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Base de données initialisée avec succès !",
 		"accounts": []string{

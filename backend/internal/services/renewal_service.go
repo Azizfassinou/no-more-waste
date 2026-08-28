@@ -30,7 +30,6 @@ func sendEmail(to string, subject string, body string) error {
 		log.Printf("[SIMULATION EMAIL] À: %s | Sujet: %s | Corps: %s", to, subject, body)
 		return nil
 	}
-
 	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
 	msg := []byte(fmt.Sprintf("To: %s\r\nSubject: %s\r\n\r\n%s", to, subject, body))
 

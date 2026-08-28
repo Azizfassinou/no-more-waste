@@ -14,17 +14,13 @@ import (
 
 func main() {
 	err := godotenv.Load()
-	if err != nil {
-		err = godotenv.Load("../.env")
-	}
+
 	if err != nil {
 		err = godotenv.Load("../../.env")
+		if err == nil {
+			log.Println("fichier .env chargé avec succès")
+		}
 	}
-
-	if err == nil {
-		log.Println("Fichier .env chargé avec succès !")
-	}
-
 	database.InitDB()
 
 	services.StartRenewalChecker()

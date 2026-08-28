@@ -16,13 +16,6 @@ func InitDB() {
 	dbFile := os.Getenv("DB_FILE")
 	if dbFile == "" {
 		dbFile = "no-more-waste.db"
-		if _, err := os.Stat(dbFile); os.IsNotExist(err) {
-			if _, err2 := os.Stat("../no-more-waste.db"); err2 == nil {
-				dbFile = "../no-more-waste.db"
-			} else if _, err3 := os.Stat("../../no-more-waste.db"); err3 == nil {
-				dbFile = "../../no-more-waste.db"
-			}
-		}
 	} else {
 		dir := filepath.Dir(dbFile)
 		if dir != "." && dir != "" {
